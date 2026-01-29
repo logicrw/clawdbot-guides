@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# Memory files (may contain personal data)
+memory/
+MEMORY.md
+
+# Sensitive local configs
+.env
+*.local
