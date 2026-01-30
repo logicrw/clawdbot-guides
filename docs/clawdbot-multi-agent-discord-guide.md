@@ -26,6 +26,37 @@ Discord Bot (1个)
 
 ---
 
+## 第零步：创建私有 Discord 服务器
+
+> ⚠️ **重要**：为了防止他人发现你的 Bot，建议创建一个**私有服务器**专门用于 Bot 交互。
+
+### 创建服务器
+
+1. 在 Discord 左侧点击 **+** 创建服务器
+2. 选择 **Create My Own** → **For me and my friends**
+3. 输入服务器名称（如 "My AI Assistant"）
+
+### 设置服务器为私有
+
+确保服务器不会被他人发现：
+
+1. 右键服务器图标 → **服务器设置**
+2. 左侧选择 **社区** → 确保**未启用**社区功能
+3. 左侧选择 **Discovery**（发现）→ 确保**未启用**服务器发现
+4. 左侧选择 **邀请** → 可以禁用或限制邀请链接
+
+### 私有服务器的好处
+
+| 设置 | 效果 |
+|------|------|
+| 不启用社区功能 | 服务器不会出现在 Discord 的公开列表中 |
+| 不启用服务器发现 | 无法通过搜索找到你的服务器 |
+| 不分享邀请链接 | 只有你知道服务器的存在 |
+
+这样即使有人知道你的 Bot 存在，也无法找到你的服务器来尝试与 Bot 交互。
+
+---
+
 ## 核心概念：Discord ID 体系
 
 在配置之前，先理解 Discord 的 ID 体系：
@@ -199,7 +230,11 @@ https://discord.com/api/oauth2/authorize?client_id=你的CLIENT_ID&permissions=8
 ```
 
 - **只配置你自己的服务器 ID**：其他服务器的消息会被忽略
-- **`requireMention: true`**：必须 @Bot 才会触发响应
+- **`requireMention: true`**（强烈建议）：
+  - 设为 `true` 后，Bot **只会响应 @提及消息**
+  - 普通消息（不带 @）会被完全忽略
+  - 这是防止误触发的重要保护层
+  - 即使是白名单用户，不 @ 也不会得到响应
 - **`users` 数组**：只有列出的用户 ID 才能与 Bot 交互
 
 #### `dm` 对象（私信配置）
@@ -217,10 +252,11 @@ https://discord.com/api/oauth2/authorize?client_id=你的CLIENT_ID&permissions=8
 
 | 防护层 | 配置项 | 效果 |
 |--------|--------|------|
-| **Discord 端** | Public Bot: OFF | 只有你能邀请 Bot |
+| **服务器隐私** | 私有服务器 + 不启用发现 | 他人无法找到你的服务器 |
+| **Bot 邀请** | Public Bot: OFF | 只有你能邀请 Bot |
 | **服务器层** | `groupPolicy: "allowlist"` + `guilds` | 只响应指定服务器 |
 | **用户层** | `guilds.*.users` | 只响应指定用户 |
-| **触发层** | `requireMention: true` | 必须 @Bot 才响应 |
+| **触发层** | `requireMention: true` | **只有 @Bot 才响应**，普通消息忽略 |
 | **私信层** | `dm.policy: "allowlist"` | 只允许指定用户私信 |
 
 即使有人把 Bot 拉到别的服务器（如果 Public Bot 没关），由于：
@@ -470,14 +506,23 @@ clawdbot status
 
 配置完成后，确认以下安全设置：
 
+### Discord 端设置
 - [ ] Discord Developer Portal 中 **Public Bot** 已关闭
+- [ ] 服务器**未启用**社区功能（防止出现在公开列表）
+- [ ] 服务器**未启用**服务器发现（防止被搜索到）
+- [ ] 服务器邀请链接未公开分享
+
+### Clawdbot 配置
 - [ ] `groupPolicy` 设置为 `"allowlist"`
 - [ ] `guilds` 中只包含你自己的服务器 ID
 - [ ] `guilds.*.users` 中只包含你自己的用户 ID
-- [ ] `guilds.*.requireMention` 设置为 `true`
+- [ ] `guilds.*.requireMention` 设置为 `true`（Bot 只响应 @提及）
 - [ ] `dm.policy` 设置为 `"allowlist"`
 - [ ] `dm.allowFrom` 中只包含你自己的用户 ID
+
+### 安全习惯
 - [ ] Bot Token 没有泄露给任何人
+- [ ] 配置文件不在公开的 Git 仓库中
 
 ---
 
